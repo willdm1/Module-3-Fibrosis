@@ -22,23 +22,23 @@ import pandas as pd
 # Load the images you want to analyze
 
 filenames = [
-    r"E:\OneDrive - University of Virginia\Will M\Undergraduate Research Courses-Grants\05_Spring_2026\Computational_Biomedical_BME_2315\Module-3-Fibrosis\chosen images\MASK_SK658 Slobe ch010147.jpg",
-    r"E:\OneDrive - University of Virginia\Will M\Undergraduate Research Courses-Grants\05_Spring_2026\Computational_Biomedical_BME_2315\Module-3-Fibrosis\chosen images\MASK_SK658 Slobe ch010149.jpg",
-    r"E:\OneDrive - University of Virginia\Will M\Undergraduate Research Courses-Grants\05_Spring_2026\Computational_Biomedical_BME_2315\Module-3-Fibrosis\chosen images\MASK_SK658 Slobe ch010156.jpg",
-    r"E:\OneDrive - University of Virginia\Will M\Undergraduate Research Courses-Grants\05_Spring_2026\Computational_Biomedical_BME_2315\Module-3-Fibrosis\chosen images\MASK_SK658 Slobe ch010157.jpg",
-    r"E:\OneDrive - University of Virginia\Will M\Undergraduate Research Courses-Grants\05_Spring_2026\Computational_Biomedical_BME_2315\Module-3-Fibrosis\chosen images\MASK_SK658 Slobe ch010158.jpg",
-    r"E:\OneDrive - University of Virginia\Will M\Undergraduate Research Courses-Grants\05_Spring_2026\Computational_Biomedical_BME_2315\Module-3-Fibrosis\chosen images\MASK_SK658 Slobe ch010159.jpg"
+    r"C:\Users\willm\OneDrive - University of Virginia\Will M\Undergraduate Research Courses-Grants\05_Spring_2026\Computational_Biomedical_BME_2315\Module-3-Fibrosis\chosen images\MASK_SK658 Slobe ch010147.jpg",
+    r"C:\Users\willm\\OneDrive - University of Virginia\Will M\Undergraduate Research Courses-Grants\05_Spring_2026\Computational_Biomedical_BME_2315\Module-3-Fibrosis\chosen images\MASK_SK658 Slobe ch010149.jpg",
+    r"C:\Users\willm\\OneDrive - University of Virginia\Will M\Undergraduate Research Courses-Grants\05_Spring_2026\Computational_Biomedical_BME_2315\Module-3-Fibrosis\chosen images\MASK_SK658 Slobe ch010156.jpg",
+    r"C:\Users\willm\\OneDrive - University of Virginia\Will M\Undergraduate Research Courses-Grants\05_Spring_2026\Computational_Biomedical_BME_2315\Module-3-Fibrosis\chosen images\MASK_SK658 Slobe ch010157.jpg",
+    r"C:\Users\willm\\OneDrive - University of Virginia\Will M\Undergraduate Research Courses-Grants\05_Spring_2026\Computational_Biomedical_BME_2315\Module-3-Fibrosis\chosen images\MASK_SK658 Slobe ch010158.jpg",
+    r"C:\Users\willm\\OneDrive - University of Virginia\Will M\Undergraduate Research Courses-Grants\05_Spring_2026\Computational_Biomedical_BME_2315\Module-3-Fibrosis\chosen images\MASK_SK658 Slobe ch010159.jpg"
 ]
 
 # Enter the depth of each image (in the same order that the images are listed above; you can find these in the .csv file provided to you which is tilted: "Filenames and Depths for Students")
 
 depths = [
-    15,
-    1000,
-    3000,
-    5300,
-    7000,
-    9900
+    3000,  # ch010147
+    3350,  # ch010149
+    330,   # ch010156
+    750,   # ch010157
+    920,   # ch010158
+    860    # ch010159
 ]
 
 # Make the lists that will be used
@@ -110,6 +110,7 @@ print("The .csv file 'Percent_White_Pixels.csv' has been created.")
 
 ##############
 # LECTURE 2: UNCOMMENT BELOW
+
 
 # Interpolate a point: given a depth, find the corresponding white pixel percentage
 
