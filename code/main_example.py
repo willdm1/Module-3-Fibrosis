@@ -1,5 +1,4 @@
 '''Module 3: count black and white pixels and compute the percentage of white pixels in a .jpg image and extrapolate points'''
-
 try:
     from termcolor import colored
 except ModuleNotFoundError:
