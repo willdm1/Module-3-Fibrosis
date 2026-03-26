@@ -69,7 +69,7 @@ RUN_BENCHMARK_STEP = True
 VALIDATION_METHOD = "linear"   # choose: "linear" or "quadratic"
 
 # Leave this list empty to automatically analyze every image in "chosen images".
-# If you want to force a specific order, list basenames here exactly as they appear.
+# If I wanted to force a specific order, list basenames here exactly as they appear.
 MANUAL_SELECTED_IMAGE_BASENAMES: List[str] = []
 
 # If True, the script uses the lecture-style matrix approach for linear/quadratic
