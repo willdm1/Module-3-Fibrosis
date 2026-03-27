@@ -16,8 +16,9 @@ What this script does:
 9. Validates the interpolated estimate using a nearby real image from the full dataset.
 10. Optionally benchmarks runtime and estimates how long the code would take for many images.
 
-Designed to be called either:
+We designed to be called either:
 - as a single script:    python main.py
+
 - from a notebook:       import main
                          main.run_image_analysis()
                          main.run_linear_interpolation()
@@ -26,13 +27,16 @@ Designed to be called either:
 
 """
 
+# This file is intended to be the main entry point for running the image analysis and interpolation tasks.
 from __future__ import annotations
 
+# standard library imports
 from pathlib import Path
 from time import perf_counter
 from typing import Dict, Iterable, List, Optional, Sequence, Tuple
 import warnings
 
+# third-party imports
 try:
     from termcolor import colored
 except ModuleNotFoundError:
@@ -50,6 +54,7 @@ except ModuleNotFoundError as e:
         "  !{sys.executable} -m pip install opencv-python"
     ) from e
 
+# local imports
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
@@ -60,6 +65,7 @@ from scipy.interpolate import interp1d
 # USER SETTINGS
 # =============================================================================
 
+# INTERPOLATION_DEPTH_UM is the depth at which we will estimate the fibrosis proxy using interpolation.
 INTERPOLATION_DEPTH_UM = 345.0
 THRESHOLD_VALUE = 127
 SHOW_PLOTS = True
@@ -69,10 +75,10 @@ RUN_BENCHMARK_STEP = True
 VALIDATION_METHOD = "linear"   # choose: "linear" or "quadratic"
 
 # Leave this list empty to automatically analyze every image in "chosen images".
-# If I wanted to force a specific order, list basenames here exactly as they appear.
+# If I wanted to force a specific order, I could list basenames here exactly as they appear.
 MANUAL_SELECTED_IMAGE_BASENAMES: List[str] = []
 
-# If True, the script uses the lecture-style matrix approach for linear/quadratic
+# If True, the script uses the matrix approach for linear/quadratic
 # interpolation in addition to SciPy's built-in interpolation.
 RUN_MANUAL_POLYNOMIAL_INTERPOLATION = True
 
@@ -80,6 +86,8 @@ RUN_MANUAL_POLYNOMIAL_INTERPOLATION = True
 # =============================================================================
 # PATHS
 # =============================================================================
+
+# Define paths relative to this script's location for better portability.
 CODE_DIR = Path(__file__).resolve().parent
 PROJECT_ROOT = CODE_DIR.parent
 CHOSEN_IMAGES_DIR = PROJECT_ROOT / "chosen images"
@@ -87,6 +95,7 @@ ALL_IMAGES_DIR = PROJECT_ROOT / "images"
 RESULTS_DIR = PROJECT_ROOT / "results"
 DEPTHS_CSV_PATH = PROJECT_ROOT / "Filenames and Depths for Students.csv"
 
+# Define specific output paths for results and plots.
 RESULTS_CSV_PATH = RESULTS_DIR / "Percent_White_Pixels.csv"
 MEASURED_PLOT_PATH = RESULTS_DIR / "Measured_Percent_White_vs_Depth.png"
 LINEAR_PLOT_PATH = RESULTS_DIR / "Linear_Interpolation.png"
@@ -96,8 +105,8 @@ VALIDATION_PLOT_PATH = RESULTS_DIR / "Interpolation_Validation.png"
 BENCHMARK_CSV_PATH = RESULTS_DIR / "Runtime_Benchmark.csv"
 INTERPOLATION_RESULTS_CSV_PATH = RESULTS_DIR / "Interpolation_Results.csv"
 
+# Supported image file extensions for searching.
 SUPPORTED_IMAGE_SUFFIXES = {".jpg", ".jpeg", ".png", ".tif", ".tiff", ".bmp"}
-
 
 # =============================================================================
 # BASIC HELPERS
@@ -162,8 +171,8 @@ def load_depth_lookup(depth_csv_path: Path = DEPTHS_CSV_PATH) -> pd.DataFrame:
     if df.empty:
         raise ValueError(f"The depths CSV appears to be empty: {depth_csv_path}")
 
-    filename_col = infer_filename_column(df.columns)
-    depth_col = infer_depth_column(df.columns)
+    filename_col = infer_filename_column(df.columns) # type: ignore
+    depth_col = infer_depth_column(df.columns) # type: ignore
 
     cleaned = df.copy()
     cleaned["original_filename_entry"] = cleaned[filename_col].astype(str)
@@ -402,6 +411,7 @@ def build_unique_interpolation_arrays(df: pd.DataFrame) -> Tuple[np.ndarray, np.
     grouped = (
         df.groupby("depth_um", as_index=False)["percent_white_pixels"]
         .mean()
+        .reset_index()
         .sort_values("depth_um")
         .reset_index(drop=True)
     )
@@ -416,7 +426,7 @@ def build_unique_interpolation_arrays(df: pd.DataFrame) -> Tuple[np.ndarray, np.
 
 
 # =============================================================================
-# MANUAL POLYNOMIAL INTERPOLATION (LECTURE-STYLE / interpolation_example.py)
+# MANUAL POLYNOMIAL INTERPOLATION (MATRIX APPROACH)
 # =============================================================================
 def choose_two_points_for_linear(x: np.ndarray, y: np.ndarray, target_x: float) -> Tuple[np.ndarray, np.ndarray]:
     """Choose two nearby points for manual linear interpolation."""
@@ -495,7 +505,7 @@ def evaluate_quadratic_polynomial(coefficients: Sequence[float], x_value: float)
 
 
 # =============================================================================
-# SCIPY INTERPOLATION (LECTURE-STYLE / main_example.py)
+# SCIPY INTERPOLATION (main_example.py)
 # =============================================================================
 def scipy_interpolate(
     x: np.ndarray,
@@ -509,7 +519,7 @@ def scipy_interpolate(
         y,
         kind=kind,
         bounds_error=False,
-        fill_value="extrapolate",
+        fill_value="extrapolate", # type: ignore
         assume_sorted=True,
     )
     return float(interpolator(target_x))
@@ -537,14 +547,17 @@ def plot_interpolation_result(
     save_plot: bool = SAVE_FIGURES,
 ) -> None:
     """Plot measured data plus one interpolated point."""
-    x_plot = np.append(x, target_x)
-    y_plot = np.append(y, target_y)
-    order = np.argsort(x_plot)
-
+    # x and y are already sorted by depth.
     plt.figure(figsize=(9, 6))
-    plt.plot(x[order[:-1]] if len(order[:-1]) == len(x) else x, y, marker="o", linestyle="-", linewidth=2, label="Measured data")
-    plt.scatter(target_x, target_y, s=110, color="red", zorder=5,
-                label=f"Interpolated point ({target_x:.1f}, {target_y:.4f})")
+    plt.plot(x, y, marker="o", linestyle="-", linewidth=2, label="Measured data")
+    plt.scatter(
+        target_x,
+        target_y,
+        s=110,
+        color="red",
+        zorder=5,
+        label=f"Interpolated point ({target_x:.1f}, {target_y:.4f})",
+    )
     plt.xlabel("Depth into lung (microns)")
     plt.ylabel("White pixels (% of total pixels)")
     plt.title(f"{method_name} Interpolation of Fibrosis at {target_x:.1f} microns")
@@ -561,7 +574,6 @@ def plot_interpolation_result(
         plt.show()
     else:
         plt.close()
-
 
 # =============================================================================
 # VERIFICATION AND VALIDATION
@@ -600,8 +612,8 @@ def verify_linear_interpolation(
     - NumPy's piecewise linear interpolation
     """
     chosen_x, chosen_y = choose_two_points_for_linear(x, y, target_x)
-    manual_coeffs = solve_linear_coefficients(chosen_x, chosen_y)
-    manual_value = evaluate_linear_polynomial(manual_coeffs, target_x)
+    manual_coeffs = solve_linear_coefficients(chosen_x.tolist(), chosen_y.tolist())
+    manual_value = evaluate_linear_polynomial(manual_coeffs, target_x) # type: ignore
     numpy_value = float(np.interp(target_x, x, y))
     absolute_difference = abs(manual_value - numpy_value)
 
@@ -639,15 +651,15 @@ def find_nearest_validation_image(
     for row in lookup.itertuples(index=False):
         if row.basename in selected_normalized:
             continue
-        image_path = find_image_path_by_basename(row.basename, [ALL_IMAGES_DIR, CHOSEN_IMAGES_DIR])
+        image_path = find_image_path_by_basename(str(row.basename), [ALL_IMAGES_DIR, CHOSEN_IMAGES_DIR])
         if image_path is not None:
-            return image_path, float(row.depth_um), row.basename
+            return image_path, float(row.depth_um), str(row.basename) # type: ignore
 
     # If every nearby image is in the selected subset, allow reuse.
     for row in lookup.itertuples(index=False):
-        image_path = find_image_path_by_basename(row.basename, [ALL_IMAGES_DIR, CHOSEN_IMAGES_DIR])
+        image_path = find_image_path_by_basename(str(row.basename), [ALL_IMAGES_DIR, CHOSEN_IMAGES_DIR])
         if image_path is not None:
-            return image_path, float(row.depth_um), row.basename
+            return image_path, float(row.depth_um), str(row.basename) # type: ignore
 
     raise FileNotFoundError(
         "Could not locate any validation image in the full dataset."
@@ -691,7 +703,7 @@ def run_validation(
     )
 
     validation_record = analyze_single_image(validation_image_path, validation_depth_um)
-    measured_percent = float(validation_record["percent_white_pixels"])
+    measured_percent = float(validation_record["percent_white_pixels"]) # type: ignore
 
     absolute_error = abs(measured_percent - predicted_percent)
     percent_relative_error = (
@@ -842,8 +854,8 @@ def run_linear_interpolation(
 
     if RUN_MANUAL_POLYNOMIAL_INTERPOLATION:
         chosen_x, chosen_y = choose_two_points_for_linear(x, y, target_depth_um)
-        coeffs = solve_linear_coefficients(chosen_x, chosen_y)
-        manual_value = evaluate_linear_polynomial(coeffs, target_depth_um)
+        coeffs = solve_linear_coefficients(chosen_x.tolist(), chosen_y.tolist())
+        manual_value = evaluate_linear_polynomial(coeffs, target_depth_um) # type: ignore
         result.update(
             {
                 "manual_coefficients": coeffs.tolist(),
@@ -895,8 +907,8 @@ def run_quadratic_interpolation(
 
     if RUN_MANUAL_POLYNOMIAL_INTERPOLATION:
         chosen_x, chosen_y = choose_three_points_for_quadratic(x, y, target_depth_um)
-        coeffs = solve_quadratic_coefficients(chosen_x, chosen_y)
-        manual_value = evaluate_quadratic_polynomial(coeffs, target_depth_um)
+        coeffs = solve_quadratic_coefficients(chosen_x.tolist(), chosen_y.tolist())
+        manual_value = evaluate_quadratic_polynomial(coeffs, target_depth_um) # type: ignore
         result.update(
             {
                 "manual_coefficients": coeffs.tolist(),
@@ -920,8 +932,8 @@ def run_quadratic_interpolation(
             warnings.warn("Could not read existing interpolation results CSV; it will be overwritten.")
             existing_rows = []
 
-    existing_rows.append(result)
-    save_interpolation_results(existing_rows)
+    existing_rows.append(result) # type: ignore
+    save_interpolation_results(existing_rows) # type: ignore
     return result
 
 
