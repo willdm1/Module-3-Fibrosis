@@ -664,6 +664,8 @@ def run_validation(
         np.nan if measured_percent == 0 else 100.0 * absolute_error / abs(measured_percent)
     )
 
+    # We compile the validation results into a DataFrame for easy saving and display. 
+    # This includes the target depth, interpolation method, predicted percent white pixels, validation image details, measured percent white pixels, and error metrics.
     validation_df = pd.DataFrame(
         {
             "target_depth_um": [float(target_depth_um)],
@@ -848,8 +850,8 @@ def run_quadratic_interpolation(
     print(f"Target depth: {target_depth_um:.1f} microns")
     print(f"SciPy quadratic interpolation: {scipy_value:.6f}% white pixels")
 
-# If the manual polynomial interpolation option is enabled, we select three points for quadratic interpolation, solve for the coefficients of the quadratic polynomial, evaluate it at the target depth, and compare it to the SciPy result. 
-# We also print the coefficients and the manual interpolation result.
+    # If the manual polynomial interpolation option is enabled, we select three points for quadratic interpolation, solve for the coefficients of the quadratic polynomial, evaluate it at the target depth, and compare it to the SciPy result. 
+    # We also print the coefficients and the manual interpolation result.
     if RUN_MANUAL_POLYNOMIAL_INTERPOLATION:
         chosen_x, chosen_y = choose_three_points_for_quadratic(x, y, target_depth_um)
         coeffs = solve_quadratic_coefficients(chosen_x.tolist(), chosen_y.tolist())
