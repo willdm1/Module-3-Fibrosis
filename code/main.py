@@ -479,7 +479,8 @@ def evaluate_quadratic_polynomial(coefficients: Sequence[float], x_value: float)
 # SCIPY INTERPOLATION (main_example.py)
 # =============================================================================
 
-# Here we define a function that uses SciPy's interp1d to perform interpolation. This function takes in the x and y data points, the target x-value for interpolation, and the kind of interpolation (e.g., "linear" or "quadratic") and returns the interpolated y-value at the target x.
+# Here we define a function that uses SciPy's interp1d to perform interpolation. 
+# This function takes in the x and y data points, the target x-value for interpolation, and the kind of interpolation (e.g., "linear" or "quadratic") and returns the interpolated y-value at the target x.
 def scipy_interpolate(
     x: np.ndarray,
     y: np.ndarray,
@@ -518,7 +519,8 @@ def plot_interpolation_result(
     save_plot: bool = SAVE_FIGURES,
 ) -> None:
 
-# We plot the original measured data points as a line with markers, and we highlight the interpolated point with a red scatter marker. The plot includes labels, a title indicating the interpolation method and target depth, a grid, and a legend.
+# We plot the original measured data points as a line with markers, and we highlight the interpolated point with a red scatter marker. 
+# The plot includes labels, a title indicating the interpolation method and target depth, a grid, and a legend.
     plt.figure(figsize=(9, 6))
     plt.plot(x, y, marker="o", linestyle="-", linewidth=2, label="Measured data")
     plt.scatter(
