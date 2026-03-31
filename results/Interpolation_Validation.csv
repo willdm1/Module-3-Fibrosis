@@ -1,0 +1,2 @@
+target_depth_um,interpolation_method,predicted_percent_white,validation_image_basename,validation_image_depth_um,measured_percent_white,absolute_error,percent_relative_error
+345.0,linear,0.9232376302991595,mask_sk658 llobe ch010040.jpg,380.0,0.9999990463256836,0.07676141602652409,7.676148923198486

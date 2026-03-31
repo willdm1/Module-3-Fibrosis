@@ -1,0 +1,2 @@
+n_images_tested,repeats,mean_total_seconds,mean_seconds_per_image,estimated_seconds_for_10000_images,estimated_minutes_for_10000_images
+15,5,0.13516596000117714,0.009011064000078476,90.11064000078477,1.5018440000130795
